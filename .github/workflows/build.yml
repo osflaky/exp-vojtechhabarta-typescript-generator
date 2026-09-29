@@ -1,0 +1,48 @@
+name: Build
+
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - build:
+            name: "Java 17 (LTS) without JSpecify"
+            java: 17
+            profiles: "!jspecify"
+            runGradle: true
+          os: macos-latest
+          arch: arm64
+          runner: macos-latest
+          expander_leg: macos-latest--arm64
+    name: ${{ matrix.build.name }} [${{ matrix.expander_leg }}]
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout sources
+      uses: actions/checkout@v4
+
+    - name: Setup JDK ${{ matrix.build.java }}
+      uses: actions/setup-java@v4
+      with:
+        # Temurin publishes no JDK 17 build for Windows on ARM64, so use Zulu there
+        distribution: ${{ (matrix.os == 'windows-latest' && matrix.arch == 
+          'arm64') && 'zulu' || 'temurin' }}
+        java-version: ${{ matrix.build.java }}
+        cache: maven
+
+    - name: Maven build
+      run: |
+        mvn --batch-mode \
+          ${{ matrix.build.profiles && format('-P {0}', matrix.build.profiles) }} \
+          clean install spotless:check
+
+    - name: Gradle build
+      if: matrix.build.runGradle == true
+      run: cd typescript-generator-gradle-plugin && ./gradlew build
+    timeout-minutes: 150
