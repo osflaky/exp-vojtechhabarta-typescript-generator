@@ -1,0 +1,42 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# Gradle
+/sample-gradle/.gradle/
+/sample-gradle/.nb-gradle/
+/sample-gradle/bin/
+/sample-gradle-spring/.gradle/
+/sample-gradle-spring/.nb-gradle/
+/sample-gradle-spring/bin/
+.gradle
+build/
+
+# nodejs
+node/
+
+# npm
+node_modules
+
+# NetBeans
+nbactions.xml
+
+# Eclipse
+**.classpath
+**.project
+**.settings
+
+# JetBrains IntelliJ
+.idea/
+*.iml
+
+# VS Code
+.vscode
+
+# generated files
+typescript-generator-core/src/test/**/*.js
+typescript-generator-core/src/test/**/*.js.map

@@ -1,0 +1,67 @@
+import cz.habarta.typescript.generator.JsonLibrary
+import cz.habarta.typescript.generator.TypeScriptOutputKind
+
+buildscript {
+    /* for plugin development only */
+    repositories {
+        mavenLocal()
+    }
+}
+
+plugins {
+    id 'java'
+    id 'groovy'
+    id 'org.jetbrains.kotlin.jvm' version '2.3.10'
+    id 'scala'
+    id 'cz.habarta.typescript-generator'
+}
+
+version = '4.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'tools.jackson.jaxrs:jackson-jaxrs-json-provider:3.1.2'
+    implementation 'org.codehaus.groovy:groovy:3.0.25'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.3.10'
+    implementation 'org.scala-lang:scala3-library_3:3.8.2'
+    implementation 'tools.jackson.module:jackson-module-kotlin:3.1.2'
+    implementation 'tools.jackson.module:jackson-module-scala_3:3.1.2'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.add('-parameters')
+}
+
+generateTypeScript {
+    classes = [
+        'cz.habarta.typescript.generator.sample.Person',
+        'cz.habarta.typescript.generator.sample.PersonGroovy',
+        'cz.habarta.typescript.generator.sample.PersonKt',
+        'cz.habarta.typescript.generator.sample.PersonScala',
+    ]
+    jsonLibrary = JsonLibrary.jackson3
+    outputKind = TypeScriptOutputKind.module
+    excludeClasses = [
+        'groovy.lang.GroovyObject',
+        'groovy.lang.MetaClass',
+        'java.io.Serializable',
+        'scala.Equals',
+        'scala.Product',
+        'scala.Serializable',
+    ]
+    jackson3Modules = [
+        'tools.jackson.module.scala.DefaultScalaModule',
+        'tools.jackson.module.kotlin.KotlinModule',
+    ]
+}
+
+tasks.build.dependsOn 'generateTypeScript'

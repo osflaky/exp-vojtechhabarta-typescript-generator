@@ -1,0 +1,82 @@
+
+package cz.habarta.typescript.generator.emitter;
+
+import cz.habarta.typescript.generator.TsProperty;
+import cz.habarta.typescript.generator.TsType;
+import cz.habarta.typescript.generator.util.Utils;
+import java.util.List;
+import org.jspecify.annotations.Nullable;
+
+
+public class TsPropertyModel extends TsProperty implements Comparable<TsProperty> {
+
+    public final List<TsDecorator> decorators;
+    public final TsModifierFlags modifiers;
+    public final boolean ownProperty; // property exists directly on the bean, should not be inherited
+    public final @Nullable TsExpression defaultValue;
+    public final @Nullable List<String> comments;
+
+    public TsPropertyModel(String name, TsType tsType, @Nullable TsModifierFlags modifiers, boolean ownProperty, @Nullable List<String> comments) {
+        this(name, tsType, /*decorators*/ null, modifiers, ownProperty, /*defaultValue*/ null, comments);
+    }
+
+    public TsPropertyModel(
+        String name,
+        TsType tsType,
+        @Nullable List<TsDecorator> decorators,
+        @Nullable TsModifierFlags modifiers,
+        boolean ownProperty,
+        @Nullable TsExpression defaultValue,
+        @Nullable List<String> comments
+    ) {
+        super(name, tsType);
+        this.decorators = Utils.listFromNullable(decorators);
+        this.modifiers = modifiers != null ? modifiers : TsModifierFlags.None;
+        this.comments = comments;
+        this.defaultValue = defaultValue;
+        this.ownProperty = ownProperty;
+    }
+
+    public List<TsDecorator> getDecorators() {
+        return decorators;
+    }
+
+    public TsPropertyModel withDecorators(List<TsDecorator> decorators) {
+        return new TsPropertyModel(getName(), tsType, decorators, modifiers, ownProperty, defaultValue, getComments());
+    }
+
+    public TsModifierFlags getModifiers() {
+        return modifiers;
+    }
+
+    public boolean isOwnProperty() {
+        return ownProperty;
+    }
+
+    public @Nullable TsExpression getDefaultValue() {
+        return defaultValue;
+    }
+
+    public TsPropertyModel withDefaultValue(@Nullable TsExpression defaultValue) {
+        return new TsPropertyModel(name, tsType, decorators, modifiers, ownProperty, defaultValue, comments);
+    }
+
+    public @Nullable List<String> getComments() {
+        return comments;
+    }
+
+    public TsPropertyModel withTsType(TsType tsType) {
+        return new TsPropertyModel(name, tsType, decorators, modifiers, ownProperty, defaultValue, comments);
+    }
+
+    @Override
+    public int compareTo(TsProperty o) {
+        return name.compareToIgnoreCase(o.getName());
+    }
+
+    @Override
+    public String toString() {
+        return "TsPropertyModel{" + "name=" + name + ", tsType=" + tsType + '}';
+    }
+
+}
